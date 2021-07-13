@@ -13,6 +13,9 @@ export default function Nextra({ Component, pageProps }) {
           title="RSS"
           href="/feed.xml"
         />
+
+        <link rel="shortcut icon" href="/hot.svg" />
+        
         <link
           rel="preload"
           href="/fonts/Inter-roman.latin.var.woff2"
