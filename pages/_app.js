@@ -14,7 +14,7 @@ export default function Nextra({ Component, pageProps }) {
           href="/feed.xml"
         />
 
-        <link rel="shortcut icon" href="/hot.svg" />
+        {/* <link rel="shortcut icon" href="/hot.svg" /> */}
         
         <link
           rel="preload"
