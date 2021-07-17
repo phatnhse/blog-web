@@ -13,7 +13,7 @@ export const Post = ({ post }) => {
           <h1 className="font-bold text-xl text-black dark:text-white">{meta.title}</h1>
           <div>
             <p className="font-light text-base text-black dark:text-white">{meta.description}</p>
-            <span className="font-light text-sm text-black dark:text-white">{meta.date} {meta.readTime + ' min read'}</span>
+            <span className="font-light text-sm text-black dark:text-white">{meta.date} {meta.readTime + ` min read`}</span>
           </div>
         </div>
       </Link>
