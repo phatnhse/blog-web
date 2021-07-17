@@ -1,7 +1,9 @@
-export default function BlogPost({ children, meta}) {
+export default function BlogPost({ children, meta }) {
   return (
     <>
-      <article>{children}</article>
+      <div className="base-container">
+        <article>{children}</article>
+      </div>
     </>
   )
 }
