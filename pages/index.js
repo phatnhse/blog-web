@@ -25,7 +25,7 @@ export default function IndexPage() {
               <p className="font-semibold text-5xl text-yellow-500 mr-12">Too hot to handle</p>
               <div className="pt-6">
                 <p className="mt-2 font-light text-lg text-black dark:text-white">
-                  Hey, I'm a Senior Software Engineer at @Alibaba @Lazada @Inspectorio @SSS
+                  Hey, I am a Senior Software Engineer at @Alibaba @Lazada @Inspectorio @SSS
                 </p>
                 <p className="mt-2 font-light text-lg text-black dark:text-white">
                   I enjoy building things. Checkout some of my production products <a href="#">here </a>
