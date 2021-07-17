@@ -18,14 +18,22 @@ export default function IndexPage() {
 
   return (
     <>
-      <div className="bg-gray-100 dark:bg-gray-800">
+      <div className="">
         <div className="base-container flex justify-between pt-6 pb-6">
           <div className="flex text-white items-center">
             <div>
-              <p className="font-semibold text-5xl tracking-tight text-black dark:text-white mr-12">Too hot to handle</p>
-              <p className="mt-2 font-light text-lg tracking-tight text-black dark:text-white mr-12">
-                Hi, my name is Phat. I love build things. Checkout my latest production apps here.
-              </p>
+              <p className="font-semibold text-5xl text-yellow-500 mr-12">Too hot to handle</p>
+              <div className="pt-6">
+                <p className="mt-2 font-light text-lg text-black dark:text-white">
+                  Hey, I'm a Senior Software Engineer at @Alibaba @Lazada @Inspectorio @SSS
+                </p>
+                <p className="mt-2 font-light text-lg text-black dark:text-white">
+                  I enjoy building things. Checkout some of my production products <a href="#">here </a>
+                </p>
+                <p className="mt-2 font-light text-lg text-black dark:text-white">
+                  This portfolio is built with Next.js and a library called Nextra.
+                </p>
+              </div>
             </div>
           </div>
           <div className="w-auto">
@@ -34,7 +42,6 @@ export default function IndexPage() {
                 src={src}
                 layout="fill"
                 objectFit="contain"
-                className="rounded-full"
               />
             </div>
           </div>
@@ -43,7 +50,7 @@ export default function IndexPage() {
 
       <div className="base-container pt-6 pt-6">
 
-        <h1 className="text-xl"> Recent Posts</h1>
+        <h1 className="font-semibold text-2xl text-red-500">Recent Posts</h1>
         {posts.map((post) => (
           <Post key={post.link} post={post} />
         ))}
