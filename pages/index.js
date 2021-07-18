@@ -1,10 +1,11 @@
-import { Post } from "../components/Post";
-import { posts } from "../getAllPosts";
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from "react";
+import { getAllPosts } from "../utils/PostRepo"
+import Link from "next/link";
+import { Post } from '../components/Post';
 
-export default function IndexPage() {
+export default function IndexPage({ posts }) {
   const { theme, setTheme } = useTheme()
   const [src, setSrc] = useState('/nongquanong-light.png')
 
@@ -51,10 +52,22 @@ export default function IndexPage() {
       <div className="base-container pt-6 pt-6">
 
         <h1 className="font-semibold text-2xl text-red-500">Recent Posts</h1>
-        {posts.map((post) => (
-          <Post key={post.link} post={post} />
-        ))}
+        <ul>
+          {posts.map((post, index) => (
+            <li key={index}>
+              <Post post={post}/>
+            </li>
+          ))}
+        </ul>
       </div>
     </>
   );
 }
+
+export const getStaticProps = async () => {
+  const posts = getAllPosts();
+
+  return {
+    props: { posts },
+  };
+};
