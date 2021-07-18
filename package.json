@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.4.1",
+    "esbuild": "^0.12.15",
     "mdx-bundler": "^5.1.0",
     "next": "11.0.1",
     "next-themes": "^0.0.15",
