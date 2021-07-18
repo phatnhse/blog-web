@@ -3,6 +3,7 @@ import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import {useEffect, useState } from 'react'
 import SearchBar from "../components/SearchBar";
+import DarkModeToggle from "./DarkModeToggle";
 
 export default function Header() {
   const [src, setSrc] = useState("/dark-mode.svg")
@@ -46,15 +47,7 @@ export default function Header() {
           <div className="flex items-center">
             <SearchBar className="mr-4" />
 
-            <div className="h-5 w-5 relative">
-              <Image
-                src={src}
-                layout="fill"
-                objectFit="contain"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="rounded-full"
-              />
-            </div>
+            <DarkModeToggle/>
           </div>
         </div>
       </nav>
