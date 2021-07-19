@@ -1,10 +1,9 @@
-import Link from "next/link";
-import React from "react";
-import { getMDXComponent } from "mdx-bundler/client";
+import React, {useMemo} from 'react'
+import {getMDXComponent} from 'mdx-bundler/client'
 import { getAllPosts, getSinglePost } from "../../utils/PostRepo"
 
 const Post = ({ code, frontmatter }) => {
-  const Component = React.useMemo(() => getMDXComponent(code), [code]);
+  const Component = useMemo(() => getMDXComponent(code), [code]);
   return (
     <div className="base-container prose prose-lg max-w-none">
       <h1>{frontmatter.title}</h1>
