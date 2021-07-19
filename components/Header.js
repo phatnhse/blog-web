@@ -21,7 +21,7 @@ export default function Header() {
       <nav className="flex items-center justify-between flex-wrap">
         <div className="flex items-center flex-shrink-0 text-white">
           <Link href={"/"}>
-            <a className="font-semibold text-xl tracking-tight text-black dark:text-white mr-12">Nóng quá nóng</a>
+            <a className="font-semibold text-xl tracking-tight text-black mr-12">Nóng quá nóng</a>
           </Link>
         </div>
         <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
