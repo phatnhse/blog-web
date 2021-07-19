@@ -7,13 +7,13 @@ import { Post } from '../components/Post';
 
 export default function IndexPage({ posts }) {
   const { theme, setTheme } = useTheme()
-  const [src, setSrc] = useState('/nongquanong-light.png')
+  const [src, setSrc] = useState('')
 
   useEffect(() => {
-    if (theme === 'light') {
-      setSrc('/nongquanong-light.png')
+    if (theme == 'light') {
+      setSrc('https://nongquanong.sfo3.cdn.digitaloceanspaces.com/nongquanong-light.png')
     } else {
-      setSrc('/nongquanong-dark.png')
+      setSrc('https://nongquanong.sfo3.cdn.digitaloceanspaces.com/nongquanong-dark.png')
     }
   }, [theme]);
 
@@ -36,11 +36,13 @@ export default function IndexPage({ posts }) {
           </div>
           <div className="w-auto">
             <div className="h-72 w-72 relative">
-              <Image
-                src={src}
-                layout="fill"
-                objectFit="contain"
-              />
+              {
+                src ? <Image
+                  src={src}
+                  layout="fill"
+                  objectFit="contain"
+                /> : null
+              }
             </div>
           </div>
         </div>
@@ -52,7 +54,7 @@ export default function IndexPage({ posts }) {
         <ul>
           {posts.map((post, index) => (
             <li key={index}>
-              <Post post={post}/>
+              <Post post={post} />
             </li>
           ))}
         </ul>

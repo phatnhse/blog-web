@@ -1,3 +1,5 @@
 module.exports = {
-  /* config options here */
+  images: {
+    domains: ['nongquanong.sfo3.cdn.digitaloceanspaces.com']
+ }
 }
