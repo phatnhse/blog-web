@@ -20,7 +20,7 @@ export default function DarkModeToggle() {
           id="toggle"
           className="toggle"
           type="checkbox"
-          defaultChecked={true}
+          checked ={theme === 'light'}
           onChange={toggle}
         />
       </div>

@@ -1,0 +1,100 @@
+---
+title: A comprehensive guide to perform effective code reviews for Android developers
+description: Code reviews are a part of most devs’ day-to-day work. Despite being a standard industry practice for many years, there are still lots of disagreements around how code reviews should be conducted. In this post, we’ll look at how our framework helps us get code reviews done efficiently.
+readTime: 4 mins
+---
+import Gist from 'react-gist'
+
+Code reviews are a part of most dev day-to-day work. Despite being a standard industry practice for many years, there are still lots of disagreements around how code reviews should be conducted. In this post, we’ll look at how our framework helps us get code reviews done efficiently.
+The authors of this post are currently working on the logistic apps of Lazada, part of Alibaba family. Our current article does not aim to provide a unified framework for code reviews, but to throw some ideas into the dark, and give a hint about how we think code reviews should be done at Lazada.
+
+## Stop nitpicking
+
+Imagine we’re going to open a PR, which is a partly iteration to clean up technical debts. The intention is to move the code to a better place. Keep in mind that the business logic should remain the same.
+
+The first reviewer points out a dozen of things:
+
+>“Can we replace `ArrayList` with `HashMap` for constant-time lookup?”
+
+AFAIK, there are only 10 values that should be held in that list, so `ArrayList` is fine in this case actually.
+
+> “Can we kotlin-ify this sort of logic? It would look better”
+
+Hmm, good point, but can we have it in another PR?
+
+> “Can you rename these variables, please? They are not consistent with other classes.”
+
+They’re actually not in the scope of this PR. Will open another technical debt.
+
+All issues are cleaned up. Few more technical tasks are added. And surprisingly, more nits are commented on.
+We both agree that we don’t like comment nitpicking, even though they’re good for the overall codebase. But at the same time, it is less harmful to the team spirit, and time-consuming as well.
+Code review is the last stop before shipping the product to people who need it, so as long as it doesn’t make any possible impacts on deliverables and team overall progress, leave a suggestion, approve. If it needs more attention, verbally communicate with others, make a team agreement. As [Jorge Castillo](https://jorgecastillo.dev/a-letter-to-my-younger-self) rightly said, “Instead of a perfectionism jerk, be an unblocker”. It doesn’t make any sense to block progress by just a variable name. Or as our colleague, [Nick Skelton](https://medium.com/google-developer-experts/how-to-pull-request-d75ac81449a5) puts it, “if a PR is full of nitpicking, you are winning”.
+
+## Automate all the things
+Frequently, code reviews contain comments nitpicking and paying attention to petty and irrelevant details. Those comments can be easily automated, and if a machine can do it, we should rely on it. If we are using any CI/CD system, we can generally let it take the responsibility of running all those checks. Most of the standard CI/CD engines nowadays (Jenkins, GitHub Actions, etc…) can take over this dull job. This is a non-exhaustive list of points that can be automated and be removed from a human review:
+
+- Checkstyle: we can define the style we want for our code (and we heavily advise using the standard that Android Studio provides). Code reviews focusing on whether there are more or fewer spaces should not happen.
+- Static analysis: Android developers have tools like `Lint` or `klint` that can provide us with static analysis of our code. Here we can tackle petty things (such as unused imports, deprecated methods being called, etc… ) or even more serious ones (potential bugs). The authors particularly recommend `Lint` and `klint`, since they are the most standard tools for Android development and cover a decent chunk of what we expect in a static analysis.
+
+*Protip:* CI/CD should be an intrinsic part of a Code Review
+
+We should not forget that a code review is a manual (or human) step in the entire process of building software. An intrinsic part of it is to have it well integrated within a CI/CD process.
+
+## Review code, not people.
+
+We usually use `git blame` to get the historical context of certain changes. It gives a better understanding of the approach taken. Sometimes it does save our life from critical incidents. Modern IDEs like Android Studio can visualize it in a more detailed way, even the author’s first and last name. Eventually, it redirects us to the one we should talk to. And that’s it, code is just code. People have a story behind it when they write it down. And believe it or not, your code is unpredictably weird on the days you feel down. So as a code reviewer, don’t get it wrong or give it a bad impression, but make constructive feedback instead, communicate with the author (sometimes over-communicate is not that bad). In return, as a PR conductor, don’t be too defensive, you will not care much about it later on when you leave the office.
+
+## Be focused and productive during code review
+Besides things that you can comment on right away without any context (code convention, lint check, company standards, etc), code reviews often require more than a look. So take your chance to read the business requirement, review possible parameters and ask people for anything unclear. This job is optional but it’s recommended to have 2 local repos, one is for work and another dedicated for code review. Make sure you always pull the latest copy of the branch that you’re about to review. Test your comment locally, make sure it is compilable and runnable (or can render if you’re commenting on a UI/UX pull request).
+The more complete a PR is created, the better. It is common to find PRs that include just a title, but we can achieve for excellency by adding a few more things:
+
+- Comprehensive description: describe what the PR is doing, what you have tried before, how was your approach to reach that code, problems you encountered if it is generating any technical debt.
+- Provide a link to the ticket describing this issue.
+- Provide screenshots of the resulting UX if this PR contains any. Or even better, upload a video showing how the app now interacts ([GitHub allows now videos](https://docs.github.com/en/github/managing-your-work-on-github/file-attachments-on-issues-and-pull-requests)).
+Considering this simple template:
+
+
+
+<Gist id='422035112b3cd70eaf86efa9ac948b4a' />
+
+
+
+
+So `[WIP]` tells us this is not the immediate PR. `[#FBI-23]` navigates us directly to the ticket and the checklist hints at what the author wants to achieve in this PR. (For other business-specifics, they should be already defined in the ticket description, if not, please contact product guys)
+
+*Protip #1*: Issue or pull request template can be configurated on Github. [With only few steps](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository), you can add it to your project and code contributors can see it when they open the PR.
+
+*Protip #2*: Most of your code repos (GitHub, Bitbucket) allow you to set up regular expressions to jump directly into the ticket side. By setting FBI-XZY as a regular expression, each FBI-XYZ becomes a link that will navigate towards your Jira or similar page. This is quite handy and allows the code review to flow dynamically.
+
+## Tools can help
+
+It is a never-ending battle between `terminal` & `git client`. Some folks are anti of rich UI client, and they find it more satisfying typing commands on terminal. However, some tools can surely help you to properly visualize.
+
+### Built-in functions
+Popular git clients (Fork, Git Kraken, SourceTree, etc) provide a set of cool features that can work out: clean commit history, side-by-side conflict panel, and many other working features.
+
+*Protip*: [Fork](https://git-fork.com/) is one internal recommended tool used in our company. It has provided great experiences so far. (Non-affiliate)
+
+![Photo on [Fork](https://git-fork.com/)](https://miro.medium.com/max/700/0*Ez-_mtsvjz5ymPh0.jpg)
+
+
+The authors have found out that Fork works especially well when we start a pull request. Here is an example workflow
+
+- Update code base with a single click which is the combination of stash, rebase, re-apply. Resolve the conflicts if any.
+- Stage changes, one file at a time.
+- Commit, push and create the PR.
+- Review one more time on created PR
+
+At this point, your code is actually reviewed 2–3 times before it gets reviewed by others.
+
+### Collaboration
+You know commands, your peer doesn’t. Your peer is the terminal’s fan, but you’re not. Seems not easy to work together. Consider using the git tool in this case. This is our assumption, given that both know git fundamentals, the person who knows terminal can learn to use git client a bit quicker, and vice versa. Hence, dual agreement on using the same git tool can accelerate the onboarding process as well as improve the experience when working together, especially in pair-programming.
+
+###Avoid human mistakes
+We hear and read plenty of comments arguing that using a terminal can do everything with git and achieve the same outcome with git tools. It is exactly true, actually, but it is undeniable that git tools play an important role to reduce human mistakes and save us a lot of time. Imagine the case where you have to search for a commit across all branches, given that there are many branches or a complex merge that has many conflicts (which should be avoided earlier or it should be broken down into multiple PRs though), we guess it is not a simple task using a terminal. You can use it, reluctantly, but in the favor of productivity, please don’t make it harder.
+
+## Summary
+For many reasons, bad code review practices might lead to unnecessary battles and end up undermining the team’s motivation. Agreeing on a code review of conduct has helped our team set standards and be more efficient and productive in code reviews and ship faster. We’d highly recommend doing the same!
+
+This is the joint article with [Enrique López-Mañas](https://twitter.com/eenriquelopez)
+. He writes his thoughts about Software Engineering and life in general on his [Twitter](https://twitter.com/eenriquelopez) account. And this is me on [Github](https://github.com/fastphat), I build and publish stuff there! You can also find me on [Twitter](https://twitter.com/phatnhse). If you have any questions for us, feel free to drop a message or leave a comment. Happy reading and remember to 👏 if you have liked the post so far.
