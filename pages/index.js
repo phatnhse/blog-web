@@ -25,14 +25,11 @@ export default function IndexPage({ posts }) {
             <div>
               <p className="font-semibold text-5xl text-yellow-500 mr-12">Too hot to handle</p>
               <div className="pt-6">
-                <p className="mt-2 font-light text-lg text-black dark:text-white">
-                  Hey, I am a Senior Software Engineer at @Alibaba @Lazada @Inspectorio @SSS
+                <p className="mt-2 font-light text-lg text-black pr-40">
+                  Hey, I am a Senior Software Engineer at <strong className="text-blue-600">@Alibaba @Lazada @Inspectorio @SSS</strong>
                 </p>
-                <p className="mt-2 font-light text-lg text-black dark:text-white">
-                  I enjoy building things. Checkout some of my production products <a href="#">here </a>
-                </p>
-                <p className="mt-2 font-light text-lg text-black dark:text-white">
-                  This portfolio is built with Next.js and a library called Nextra.
+                <p className="mt-2 font-light text-lg text-black pr-40">
+                  I enjoy building things.
                 </p>
               </div>
             </div>
