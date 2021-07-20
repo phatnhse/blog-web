@@ -12,7 +12,7 @@ const Post = ({ code, frontmatter }) => {
       <p className="text-center text-gray-500 text-base">{frontmatter.description}</p>
       <div className="flex justify-center">
         {tags.map(tag => {
-          return <span id={tag} className="rounded pt-1 pb-1 pl-2 pr-2 text-base bg-gray-200 mr-2 ml-2">{tag}</span>
+          return <span key={tag} className="rounded pt-1 pb-1 pl-2 pr-2 text-base bg-gray-200 mr-2 ml-2">{tag}</span>
         })}
       </div>
 
