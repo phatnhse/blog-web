@@ -14,14 +14,18 @@ export const getAllPosts = () => {
     .readdirSync(POSTS_PATH)
     .filter((path) => /\.mdx?$/.test(path))
     .map((fileName) => {
-      const source = getSourceOfFile(fileName);
-      const slug = fileName.replace(/\.mdx?$/, "");
-      const { data } = matter(source);
+      const source = getSourceOfFile(fileName)
+      const slug = fileName.replace(/\.mdx?$/, "")
+      const { data } = matter(source)
 
       return {
         frontmatter: data,
         slug: slug,
-      };
+      }
+    })
+    .filter(({frontmatter, slug})=>{
+      console.log(frontmatter.wip)
+      return frontmatter.wip === false
     });
 };
 
