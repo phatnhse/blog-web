@@ -9,6 +9,10 @@
   background-color: #121212;
 }
 
+.a-link {
+  @apply underline text-blue-600 text-base hover:text-blue-800
+}
+
 .base-container {
   @apply mx-auto px-4 sm:px-6 lg:px-8;
   max-width: 65rem;
