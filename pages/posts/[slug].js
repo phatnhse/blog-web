@@ -7,8 +7,11 @@ const Post = ({ code, frontmatter }) => {
   const Component = useMemo(() => getMDXComponent(code), [code]);
 
   return (
-    <div className="base-container prose prose-lg max-w-none mt-24 mb-24">
+    <div className="base-container prose prose-lg max-w-none mt-24 mb-0">
       <h1 className="text-center">{frontmatter.title}</h1>
+      <div className="flex justify-center font-medium text-sm text-gray-600">
+        <p className="">{frontmatter.readTime} . {frontmatter.publishedOn}</p>
+      </div>
       <p className="text-center text-gray-500 text-base">{frontmatter.description}</p>
       <div className="flex justify-center">
         {tags.map(tag => {
