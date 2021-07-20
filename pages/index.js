@@ -6,6 +6,14 @@ import { Post } from '../components/Post';
 import LittleTokyo from '../data/posts/tokyo/LittleTokyo';
 
 export default function IndexPage({ posts }) {
+  const tags = posts.flatMap(post => {
+    return post.frontmatter.tags ? post.frontmatter.tags.split(',') : []
+  })
+    .map(tag => {
+      return tag.trim()
+    })
+  const uniqueTags = [...new Set(tags)]
+
   const { theme, setTheme } = useTheme()
   const [src, setSrc] = useState('')
 
@@ -50,7 +58,7 @@ export default function IndexPage({ posts }) {
 
       <div className="base-container pt-6 pt-6">
 
-        <h1 className="font-semibold text-2xl text-red-500">Recent Posts</h1>
+        <h1 className="font-medium text-sm text-gray-500">LATEST POST</h1>
         <ul>
           {posts.map((post, index) => (
             <li key={index}>
