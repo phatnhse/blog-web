@@ -1,9 +1,8 @@
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from "react";
-import { getAllPosts } from "../utils/PostRepo"
+import { getAllRecentPosts } from "../utils/PostRepo"
 import { Post } from '../components/Post';
-import LittleTokyo from '../data/posts/tokyo/LittleTokyo';
 
 export default function IndexPage({ posts }) {
   const tags = posts.flatMap(post => {
@@ -72,7 +71,7 @@ export default function IndexPage({ posts }) {
 }
 
 export const getStaticProps = async () => {
-  const posts = getAllPosts();
+  const posts = getAllRecentPosts();
 
   return {
     props: { posts },
