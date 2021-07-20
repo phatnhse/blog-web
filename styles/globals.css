@@ -18,6 +18,10 @@
   max-width: 65rem;
 }
 
+.container-medium {
+  @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
 .menu-text {
   @apply text-base font-normal;
 }
