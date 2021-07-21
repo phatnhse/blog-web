@@ -5,11 +5,11 @@ import { bundleMDX } from "mdx-bundler"
 
 export const POSTS_PATH = path.join(process.cwd(), "/data/posts")
 
-export function getSourceOfFile(fileName) {
+export const getSourceOfFile = (fileName) => {
   return fs.readFileSync(path.join(POSTS_PATH, fileName))
-}
+};
 
-export function getAllRecentPosts() {
+export const getAllRecentPosts = () => {
   return getAllPosts()
     .sort((a, b) => {
       const dateA = new Date(a.frontmatter.publishedOn)
@@ -18,7 +18,7 @@ export function getAllRecentPosts() {
     })
 }
 
-export function getAllPosts() {
+export const getAllPosts = () => {
   return fs
     .readdirSync(POSTS_PATH)
     .filter((path) => /\.mdx?$/.test(path))
@@ -37,7 +37,7 @@ export function getAllPosts() {
     })
 }
 
-export async function getSinglePost(slug) {
+export const getSinglePost = async (slug) => {
   const source = getSourceOfFile(slug + ".mdx")
 
   const { code, frontmatter } = await bundleMDX(source, {
@@ -48,4 +48,4 @@ export async function getSinglePost(slug) {
     frontmatter,
     code,
   }
-}
+};
