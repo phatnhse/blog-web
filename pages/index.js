@@ -3,6 +3,7 @@ import { useTheme } from 'next-themes'
 import { useEffect, useState } from "react";
 import { getAllRecentPosts } from "../utils/PostRepo"
 import { Post } from '../components/Post';
+import Profile from '../components/Profile';
 
 export default function IndexPage({ posts }) {
   const tags = posts.flatMap(post => {
@@ -30,15 +31,7 @@ export default function IndexPage({ posts }) {
         <div className="base-container flex justify-between pt-6 pb-6">
           <div className="flex text-white items-center">
             <div>
-              <p className="font-semibold text-5xl text-yellow-500 mr-12">Too hot to handle</p>
-              <div className="pt-6">
-                <p className="mt-2 font-light text-lg text-black pr-40">
-                  Hey, I am a Senior Software Engineer at <strong className="text-blue-600">@Alibaba @Lazada @Inspectorio @SSS</strong>
-                </p>
-                <p className="mt-2 font-light text-lg text-black pr-40">
-                  I enjoy building things.
-                </p>
-              </div>
+              <Profile />
             </div>
           </div>
           <div className="w-auto">
@@ -54,9 +47,7 @@ export default function IndexPage({ posts }) {
           </div>
         </div>
       </div>
-
-      <div className="base-container pt-6 pt-6">
-
+      <div className="base-container pt-6 pt-20">
         <h1 className="font-medium text-sm text-gray-500">LATEST POST</h1>
         <ul>
           {posts.map((post, index) => (
@@ -71,9 +62,10 @@ export default function IndexPage({ posts }) {
 }
 
 export const getStaticProps = async () => {
-  const posts = getAllRecentPosts();
+  const posts = getAllRecentPosts()
 
   return {
     props: { posts },
   };
 };
+
