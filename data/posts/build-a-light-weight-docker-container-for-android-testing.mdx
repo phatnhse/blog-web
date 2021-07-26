@@ -2,7 +2,7 @@
 title: Build a Lightweight Docker Container For Android Testing
 description: Testing helps us identify any defects or errors that may have been made during development. But it takes time and resources, especially in Android where it requires the installation of many dependencies and a device to perform UI tests. By using a Docker container, we can build and run tests for multiple feature branches, speeding up the development and increasing productivity. In this tutorial, we’re going to learn how to build a lightweight Android container to isolate the testing process.
 readTime: 6 min read
-tags: docker, android, android-emulator, testing, CI/CD, gradle
+tags: docker, android, android-emulator, testing, CI, gradle
 wip: false
 publishedOn: Dec 5, 2019
 ---
@@ -84,7 +84,6 @@ Like Gradle, we’ll save it to `/tmp` and get it extracted in `/opt`
 ```
 $ wget 'https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip' -P /tmp \
 && unzip -d /opt/android /tmp/sdk-tools-linux-4333796.zip \
-
 ```
 > The Android software development kit (SDK) includes different components, including SDK Tools, Build Tools, and Platform Tools. The SDK Tools primarily includes the stock Android emulator, [hierarchy viewer](https://developer.android.com/studio/profile/hierarchy-viewer.html), [SDK manager](https://developer.android.com/studio/intro/update.html), and [ProGuard](https://guides.codepath.com/android/Configuring-ProGuard). The Build Tools primarily include aapt (Android packaging tool to create .APK), dx (Android tool that converts .java files to .dex files). Platform Tools include the [Android debug shell](https://developer.android.com/studio/command-line/adb.html), [sqlite3](https://developer.android.com/studio/command-line/sqlite3.html) and [Systrace](https://developer.android.com/studio/profile/systrace-commandline.html).
 
@@ -92,7 +91,6 @@ Most important packages are `platform-tools`, `tools` and `emulator`. Run this t
 
 ```
 $ yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-images;android-*28*;google_apis;x86" "platforms;android-28" "build-tools;28.0.3" "emulator"
-
 ```
 * `platform-tools` contains `adb`
 

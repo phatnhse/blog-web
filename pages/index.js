@@ -1,20 +1,15 @@
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from "react";
-import { getAllRecentPosts } from "../utils/PostRepo"
+import { getAllPosts } from "../utils/PostRepo"
+import { getAllTils } from "../utils/TilRepo"
 import { Post } from '../components/Post';
 import Profile from '../components/Profile';
-import Zoom from 'react-medium-image-zoom'
+import Tags from '../components/Tags';
+import TilOneLine from '../components/TilOneline';
+import { getAllTagsFrom } from '../utils/TagRepo';
 
-export default function IndexPage({ posts }) {
-  const tags = posts.flatMap(post => {
-    return post.frontmatter.tags ? post.frontmatter.tags.split(',') : []
-  })
-    .map(tag => {
-      return tag.trim()
-    })
-  const uniqueTags = [...new Set(tags)]
-
+export default function IndexPage({ posts, tils }) {
   const { theme, setTheme } = useTheme()
   const [src, setSrc] = useState('')
 
@@ -28,7 +23,7 @@ export default function IndexPage({ posts }) {
 
   return (
     <>
-      <div className="">
+      <div>
         <div className="base-container flex justify-between pt-6 pb-6">
           <div className="flex text-white items-center">
             <div>
@@ -48,25 +43,48 @@ export default function IndexPage({ posts }) {
           </div>
         </div>
       </div>
-      <div className="base-container pt-6 pt-20">
-        <h1 className="font-medium text-sm text-gray-500">LATEST POST</h1>
-        <ul>
-          {posts.map((post, index) => (
-            <li key={index}>
-              <Post post={post} />
-            </li>
-          ))}
-        </ul>
+
+      <div className="base-container mt-16 grid grid-cols-5">
+        <div className="col-span-3">
+          <div>
+            <h1 className="font-medium text-sm text-gray-500">LATEST POST</h1>
+            <ul>
+              {posts.map((post, index) => (
+                <li key={index}>
+                  <Post post={post} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="col-span-2 p-4">
+          <h1 className="font-medium text-sm text-gray-500">POPULAR TAGS</h1>
+          <div className="pt-4">
+            <Tags tags={ getAllTagsFrom(posts.concat(tils))} />
+          </div>
+
+          <div>
+            <h1 className="font-medium text-sm text-gray-500 pt-16">TODAY I LEARN</h1>
+            <ul>
+              {tils.map((til, index) => (
+                <li key={index}>
+                  <TilOneLine til={til} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </>
   );
 }
 
 export const getStaticProps = async () => {
-  const posts = getAllRecentPosts()
+  const posts = getAllPosts()
+  const tils = getAllTils()
 
   return {
-    props: { posts },
+    props: { posts, tils },
   };
 };
 

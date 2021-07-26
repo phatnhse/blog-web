@@ -1,5 +1,5 @@
 import { Post } from '../../components/Post';
-import { getAllRecentPosts } from '../../utils/PostRepo';
+import { getAllPosts } from '../../utils/PostRepo';
 
 
 export default function Posts({ posts }) {
@@ -20,7 +20,7 @@ export default function Posts({ posts }) {
 }
 
 export const getStaticProps = async () => {
-  const posts = getAllRecentPosts();
+  const posts = getAllPosts();
 
   return {
     props: { posts },
