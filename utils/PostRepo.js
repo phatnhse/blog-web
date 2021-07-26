@@ -9,15 +9,6 @@ export function getSourceOfFile(fileName) {
   return fs.readFileSync(path.join(POSTS_PATH, fileName))
 }
 
-export function getAllRecentPosts() {
-  return getAllPosts()
-    .sort((a, b) => {
-      const dateA = new Date(a.frontmatter.publishedOn)
-      const dateB = new Date(b.frontmatter.publishedOn)
-      return dateB - dateA
-    })
-}
-
 export function getAllPosts() {
   return fs
     .readdirSync(POSTS_PATH)
@@ -35,6 +26,11 @@ export function getAllPosts() {
     .filter(({ frontmatter, slug }) => {
       return frontmatter.wip === false
     })
+    .sort((a, b) => {
+      const dateA = new Date(a.frontmatter.publishedOn)
+      const dateB = new Date(b.frontmatter.publishedOn)
+      return dateB - dateA
+    })
 }
 
 export async function getSinglePost(slug) {
@@ -48,4 +44,14 @@ export async function getSinglePost(slug) {
     frontmatter,
     code,
   }
+}
+
+export function getAllPostsWithTag(slug) {
+  const posts = getAllPosts()
+    .filter(post => {
+      const tags = post.frontmatter.tags ? post.frontmatter.tags.split(',').map(it => it.trim()) : []
+      return tags.includes(slug)
+    })
+
+  return posts
 }

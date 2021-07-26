@@ -37,3 +37,13 @@ export async function getSingleTil(slug) {
     code,
   }
 }
+
+export function getAllTilsWithTag(slug) {
+  const tils = getAllTils()
+    .filter(til => {
+      const tags = til.frontmatter.tags ? til.frontmatter.tags.split(',').map(it => it.trim()) : []
+      return tags.includes(slug)
+    })
+
+  return tils
+}
