@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getAllRecentPosts } from "../utils/PostRepo"
 import { Post } from '../components/Post';
 import Profile from '../components/Profile';
+import Zoom from 'react-medium-image-zoom'
 
 export default function IndexPage({ posts }) {
   const tags = posts.flatMap(post => {
