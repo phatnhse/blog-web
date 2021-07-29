@@ -23,25 +23,25 @@ The image that we build on top of is: ubuntu:latest
 
 Assuming you have docker installed (if not, please follow this [link](https://docs.docker.com/docker-for-mac/install/)), you can run this to start docker container:
 
+```bash
+docker run --privileged -dit --name android-container ubuntu
 ```
-$ docker run --privileged -dit --name android-container ubuntu
-```
 
-* — `privileged`: grant permission to launch VM on container.
+* `privileged`: grant permission to launch VM on container.
 
-* — `it`: interactively execute shell cmd.
+* `it`: interactively execute shell cmd.
 
-* — `d`: run container in the background.
+* `d`: run container in the background.
 
-* — `name android-container`: container’s name, will use later to attach and commit docker image.
+* `name android-container`: container’s name, will use later to attach and commit docker image.
 
-(Optional) To run docker as non-root, the simplest way is adding the current user to group docker
+To run docker as non-root, the simplest way is adding the current user to group docker
 
-```
-$ sudo groupadd docker // Add group docker if it doesn't already exist
-$ sudo gpasswd -a $USER docker // Add current user to group docker
-$ newgrp docker // reload (or you can re-login to reload)
-$ docker run hello-world // check if it works
+```bash
+sudo groupadd docker // Add group docker if it doesn't already exist
+sudo gpasswd -a $USER docker // Add current user to group docker
+newgrp docker // reload (or you can re-login to reload)
+docker run hello-world // check if it works
 ```
 
 ## 2. Install SDK packages
@@ -50,27 +50,25 @@ $ docker run hello-world // check if it works
 
 Make sure you install the following dependencies. Otherwise, you may notice No such file or directory when installing android SDK or start emulator
 
-*Please double-check the redundant dependencies. (for example: vim — if you’re not a fan)
-
-```
-$ apt update && apt install -y openjdk-8-jdk vim git unzip libglu1 libpulse-dev libasound2 libc6  libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxi6  libxtst6 libnss3 wget
+```bash
+apt update && apt install -y openjdk-8-jdk vim git unzip libglu1 libpulse-dev libasound2 libc6  libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxi6  libxtst6 libnss3 wget
 ```
 
 ### **Gradle**
 
-Install `gradle` and `gradle-wrapper` . We’ll use version `5.4.1` in this tutorial. No worries, it can be updated with `build-arg` later 😊
+Install gradle and gradle-wrapper . We’ll use version 5.4.1 in this tutorial (you can update it later with build-arg)
 
-Download `gradle-5.4.1` to `/tmp/gradle-5.4.1` and unzip the content within `/opt/gradle`
+Download gradle-5.4.1 to `/tmp/gradle-5.4.1` and unzip the content within `/opt/gradle`
 
-```
-$ wget https://services.gradle.org/distributions/gradle-5.4.1-bin.zip -P /tmp \ 
+```bash
+wget https://services.gradle.org/distributions/gradle-5.4.1-bin.zip -P /tmp \ 
 && unzip -d /opt/gradle /tmp/gradle-5.4.1-bin.zip
 ```     
 
 Make a new directory `/opt/gradlew` and install `gradle-wrapper` there. (The directory names can be anything, but save the files to somewhere that easy to find)
 
-```
-$ mkdir /opt/gradlew \
+```bash
+mkdir /opt/gradlew \
 && /opt/gradle/gradle-5.4.1/bin/gradle wrapper --gradle-version 5.4.1 --distribution-type all -p /opt/gradlew \
 && /opt/gradle/gradle-5.4.1/bin/gradle wrapper -p /opt/gradlew
 ```
@@ -79,18 +77,19 @@ $ mkdir /opt/gradlew \
 
 You will need to download SDK manually without Android Studio bundled, SDK tools only, check the link [here](https://developer.android.com/studio) to get the URL.
 
+> The Android software development kit (SDK) includes different components, including SDK Tools, Build Tools, and Platform Tools. The SDK Tools primarily includes the stock Android emulator, [hierarchy viewer](https://developer.android.com/studio/profile/hierarchy-viewer.html), [SDK manager](https://developer.android.com/studio/intro/update.html), and [ProGuard](https://guides.codepath.com/android/Configuring-ProGuard). The Build Tools primarily include aapt (Android packaging tool to create .APK), dx (Android tool that converts .java files to .dex files). Platform Tools include the [Android debug shell](https://developer.android.com/studio/command-line/adb.html), [sqlite3](https://developer.android.com/studio/command-line/sqlite3.html) and [Systrace](https://developer.android.com/studio/profile/systrace-commandline.html).
+
 Like Gradle, we’ll save it to `/tmp` and get it extracted in `/opt`
 
-```
-$ wget 'https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip' -P /tmp \
+```bash
+wget 'https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip' -P /tmp \
 && unzip -d /opt/android /tmp/sdk-tools-linux-4333796.zip \
 ```
-> The Android software development kit (SDK) includes different components, including SDK Tools, Build Tools, and Platform Tools. The SDK Tools primarily includes the stock Android emulator, [hierarchy viewer](https://developer.android.com/studio/profile/hierarchy-viewer.html), [SDK manager](https://developer.android.com/studio/intro/update.html), and [ProGuard](https://guides.codepath.com/android/Configuring-ProGuard). The Build Tools primarily include aapt (Android packaging tool to create .APK), dx (Android tool that converts .java files to .dex files). Platform Tools include the [Android debug shell](https://developer.android.com/studio/command-line/adb.html), [sqlite3](https://developer.android.com/studio/command-line/sqlite3.html) and [Systrace](https://developer.android.com/studio/profile/systrace-commandline.html).
 
 Most important packages are `platform-tools`, `tools` and `emulator`. Run this to install them quickly:
 
-```
-$ yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-images;android-*28*;google_apis;x86" "platforms;android-28" "build-tools;28.0.3" "emulator"
+```bash
+yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-images;android-*28*;google_apis;x86" "platforms;android-28" "build-tools;28.0.3" "emulator"
 ```
 * `platform-tools` contains `adb`
 
@@ -102,26 +101,26 @@ $ yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-i
 
 Accept all licenses of Android SDK
 
-```
-$ yes Y | /opt/android/tools/bin/sdkmanager --licenses
+```bash
+yes Y | /opt/android/tools/bin/sdkmanager --licenses
 ```    
 
 Seems good, now create an avd **`test`**
 
-```
-$ echo "no" | /opt/android/tools/bin/avdmanager --verbose create avd --force --name "test" --device "pixel" --package "system-images;android-28;google_apis;x86" --tag "google_apis" --abi "x86"
+```bash
+echo "no" | /opt/android/tools/bin/avdmanager --verbose create avd --force --name "test" --device "pixel" --package "system-images;android-28;google_apis;x86" --tag "google_apis" --abi "x86"
 ```    
 
-* — name: device’s name.
+* name: device’s name.
 
-* — abi: CPU architecture.
+* abi: CPU architecture.
 
-* — tag `google_api`: support Google API.
+* tag `google_api`: support Google API.
 
 Check one more time to see if it works!
 
-```
-$ /opt/android/emulator/emulator -list-avds 
+```bash
+/opt/android/emulator/emulator -list-avds 
 # Expected Result: test
 ```
 
@@ -129,19 +128,16 @@ $ /opt/android/emulator/emulator -list-avds
 
 Edit your `.bashrc` or any config files that you’re familiar with:
 
-* GRADLE_HOME=/opt/gradle/gradle-5.4.1
+```bash
+GRADLE_HOME=/opt/gradle/gradle-5.4.1
+ANDROID_HOME=/opt/android
+PATH=$PATH:$GRADLE_HOME/bin:/opt/gradlew:$ANDROID_HOME/emulator:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+LD_LIBRARY_PATH= $ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/qt/lib
+```
 
-* *ANDROID_HOME*=/opt/android
+***Note***: Order matters, android sdk provides 2 executed file for `emulator`, one located under `/android/emulator` and another is `/android/tools/bin`.
 
-* *PATH=*$*PATH*:$*GRADLE_HOME*/bin:/opt/gradlew:$*ANDROID_HOME*/emulator:$*ANDROID_HOME*/tools/bin:$*ANDROID_HOME*/platform-tools
-
-* *LD_LIBRARY_PATH= $ANDROID_HOME*/emulator/lib64:$*ANDROID_HOME*/emulator/lib64/qt/lib
-
-Then reflect the changes with `source ~/.bashrc`
-
-***Note***: The order of PATH variable is important because android provides 2 executed file for `emulator`, one is packaged in `/android/emulator` and another is in `/android/tools/bin`. We’ll use `/android/emulator` to run android device.
-
-More detail is this [SO answer](https://stackoverflow.com/a/49511666/5460066).
+Check this [SO answer](https://stackoverflow.com/a/49511666/5460066) for more detail.
 
 ## 4. Run emulator
 
@@ -155,7 +151,7 @@ Here are some minor steps before running emulator:
 
 Some test cases will perform an action on a view that might be not visible on a small screen — so we set the emulator up to have a high resolution (1440x2880)
 
-```
+```bash
 function wait_emulator_to_be_ready() {
   adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
   emulator -avd test -no-audio -no-boot-anim -no-window -accel on -gpu off -skin 1440x2880 &
@@ -188,7 +184,7 @@ Start the emulator with sh `start.sh` or `./start.sh` and wait until `Boot Stat
 
 Check again by enter `bg` to see the background jobs.
 
-```
+```bash
 $ ./start.sh
 emulator: WARNING: Your AVD has been configured with an in-guest renderer, but the system image does not support guest rendering.Falling back to 'swiftshader_indirect' mode.
 WARNING: change of renderer detected.
@@ -219,8 +215,8 @@ emulator: Revoking microphone permissions for Google App.
 
 Check running emulators
 
-```
-$ adb devices
+```bash
+adb devices
 List of devices attached
 emulator-5554 device
 ```
@@ -231,21 +227,21 @@ We have an Android emulator running in the container successfully!
 
 Open a new terminal tab, stop `android-container` and commit your changes to create a new Docker image:
 
-```
-$ docker stop android-container && docker commit android-container android-container:v1
+```bash
+docker stop android-container && docker commit android-container android-container:v1
 ```
 
 Test once again:
 
-```
-$ docker images
+```bash
+docker images
 # Expected result: REPOSITORY          TAG
                    android-container   v1
 ```
 
 For further extending with more configurations (ex: Flutter), let’s wrap things up and finalize the `Dockerfile`
 
-```
+```bash
 FROM ubuntu
 
 LABEL maintainer "codecaigicungduoc@gmail"
@@ -287,29 +283,29 @@ RUN chmod +x start.sh
 
 Check out your project configurations and build the ocker image with appropriate arguments:
 
-```
-$ docker build \
-  --build-arg GRADLE_VERSION=5.4.1 \
-  --build-arg ANDROID_API_LEVEL=28 \
-  --build-arg ANDROID_BUILD_TOOLS_LEVEL=28.0.3 \
-  --build-arg EMULATOR_NAME=test \
-  -t android-container .
+```bash
+docker build \
+--build-arg GRADLE_VERSION=5.4.1 \
+--build-arg ANDROID_API_LEVEL=28 \
+--build-arg ANDROID_BUILD_TOOLS_LEVEL=28.0.3 \
+--build-arg EMULATOR_NAME=test \
+-t android-container .
 ```
 
 Enter the top level of your project directory and run:
 
+```bash
+docker run --privileged -it --rm -v $PWD:/data android-container bash -c ". /start.sh && gradlew build -p /data"
 ```
-$ docker run --privileged -it --rm -v $PWD:/data android-container bash -c ". /start.sh && gradlew build -p /data"
-```
 
-* -`it`: interactive mode.
+* `it`: interactive mode.
 
-* — `rm`: remove volume after the process is completed.
+* `rm`: remove volume after the process is completed.
 
-* -v `$PWD:/data`: mount your directory into the container:/data
+* `-v $PWD:/data`: mount your directory into the container:/data
 
-* bash `-c “ . /start.sh && gradlew build -p /data”`: start the emulator and build project.
+* `bash -c “ . /start.sh && gradlew build -p /data”`: start the emulator and build project.
 
-Voilà! We have the whole testing process run independently on docker container. Let’s get back to other stuff while waiting for the report. 😝 😝
+Voilà! We have the whole testing process run independently on docker container.
 
 For more detailed about build steps and sample, please check out this [GitHub repo](https://github.com/fastphat/android-container). I’ve made a cool sample with [Sunflower](https://github.com/android/sunflower) project.

@@ -45,7 +45,7 @@ export default function Header() {
             </Link>
           </div>
           <div className="flex items-center">
-            <SearchBar className="mr-4" />
+            {/* <SearchBar className="mr-4" /> */}
 
             <DarkModeToggle/>
           </div>

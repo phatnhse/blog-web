@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react'
 import { getMDXComponent } from 'mdx-bundler/client'
 import { getAllPosts, getSinglePost } from "../../utils/PostRepo"
+import InlineCode from '../../components/markdown/InlineCode';
+import BlockQuote from '../../components/markdown/BlockQuote';
+import PreCode from '../../components/markdown/PreCode';
+import Tags from '../../components/Tags'
+import CustomLink from '../../components/markdown/CustomLink';
 
 const Post = ({ code, frontmatter }) => {
   const tags = frontmatter.tags ? frontmatter.tags.split(',') : []
@@ -13,13 +18,18 @@ const Post = ({ code, frontmatter }) => {
         {frontmatter.readTime} . {frontmatter.publishedOn}
       </div>
       <div className="flex justify-center">
-        {tags.map(tag => {
-          return <span key={tag} className="rounded pt-1 pb-1 pl-2 pr-2 text-base bg-gray-200 mr-2 ml-2">{tag}</span>
-        })}
+        <Tags tags={tags} />
       </div>
 
       <div className="mt-16 mb-16 prose prose-lg">
-        <Component />
+        <Component components={
+          {
+            'code': InlineCode,
+            'blockquote': BlockQuote,
+            'a': CustomLink,
+            'pre': PreCode
+          }
+        } />
       </div>
     </div>
   );

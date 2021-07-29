@@ -20,8 +20,8 @@ export default function Temparature() {
   if (temp > 0.0) {
     return <Link href="https://openweathermap.org/city/1580578">
       <a className="ml-2">
-        <p className="max-w-min rounded-xl bg-gray-100 dark:bg-gray-700 shadow ml-2 mr-2 pl-2 pr-2 pt-1 pb-1 flex justify-between">
-          <span className="text-base font-medium mr-2">26ºC</span>
+        <p className="max-w-medium rounded-xl bg-gray-100 dark:bg-gray-700 shadow ml-2 mr-2 pl-2 pr-2 pt-1 pb-1 flex justify-between">
+          <span className="text-base font-medium mr-2">{Math.floor(temp)}ºC</span>
           <span className={temp > 25 ? "weather-icon mt-1 sun" : "weather-icon mt-1 cloud"}></span>
         </p>
       </a>
