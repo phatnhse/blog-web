@@ -1,5 +1,6 @@
 import Layout from "../components/Layout";
 import '../styles/globals.css'
+import '../styles/prism-nord.css'
 import 'react-medium-image-zoom/dist/styles.css'
 import { ThemeProvider } from 'next-themes'
 

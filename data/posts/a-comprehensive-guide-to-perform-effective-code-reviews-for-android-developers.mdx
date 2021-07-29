@@ -16,15 +16,15 @@ Imagine we’re going to open a PR, which is a partly iteration to clean up tech
 
 The first reviewer points out a dozen of things:
 
->“Can we replace `ArrayList` with `HashMap` for constant-time lookup?”
+> Can we replace `ArrayList` with `HashMap` for constant-time lookup?
 
 AFAIK, there are only 10 values that should be held in that list, so `ArrayList` is fine in this case actually.
 
-> “Can we kotlin-ify this sort of logic? It would look better”
+> Can we kotlin-ify this sort of logic? It would look better
 
 Hmm, good point, but can we have it in another PR?
 
-> “Can you rename these variables, please? They are not consistent with other classes.”
+> Can you rename these variables, please? They are not consistent with other classes.
 
 They’re actually not in the scope of this PR. Will open another technical debt.
 
@@ -55,12 +55,7 @@ The more complete a PR is created, the better. It is common to find PRs that inc
 - Provide screenshots of the resulting UX if this PR contains any. Or even better, upload a video showing how the app now interacts ([GitHub allows now videos](https://docs.github.com/en/github/managing-your-work-on-github/file-attachments-on-issues-and-pull-requests)).
 Considering this simple template:
 
-
-
 <Gist id='422035112b3cd70eaf86efa9ac948b4a' />
-
-
-
 
 So `[WIP]` tells us this is not the immediate PR. `[#FBI-23]` navigates us directly to the ticket and the checklist hints at what the author wants to achieve in this PR. (For other business-specifics, they should be already defined in the ticket description, if not, please contact product guys)
 
@@ -92,7 +87,7 @@ At this point, your code is actually reviewed 2–3 times before it gets reviewe
 ### Collaboration
 You know commands, your peer doesn’t. Your peer is the terminal’s fan, but you’re not. Seems not easy to work together. Consider using the git tool in this case. This is our assumption, given that both know git fundamentals, the person who knows terminal can learn to use git client a bit quicker, and vice versa. Hence, dual agreement on using the same git tool can accelerate the onboarding process as well as improve the experience when working together, especially in pair-programming.
 
-###Avoid human mistakes
+### Avoid human mistakes
 We hear and read plenty of comments arguing that using a terminal can do everything with git and achieve the same outcome with git tools. It is exactly true, actually, but it is undeniable that git tools play an important role to reduce human mistakes and save us a lot of time. Imagine the case where you have to search for a commit across all branches, given that there are many branches or a complex merge that has many conflicts (which should be avoided earlier or it should be broken down into multiple PRs though), we guess it is not a simple task using a terminal. You can use it, reluctantly, but in the favor of productivity, please don’t make it harder.
 
 ## Summary
