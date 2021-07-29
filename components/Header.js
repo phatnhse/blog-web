@@ -17,7 +17,7 @@ export default function Header() {
   }, [theme])
 
   return (
-    <div className="base-container pt-4 pb-4">
+    <div className="base-container mt-8 pt-4 pb-4">
       <nav className="flex items-center justify-between flex-wrap">
         <div className="flex items-center flex-shrink-0 text-white">
           <Link href={"/"}>
