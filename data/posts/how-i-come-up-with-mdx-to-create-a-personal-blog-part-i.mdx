@@ -1,0 +1,23 @@
+---
+title: How I come up with MDX to create a personal blog (Part I)
+description: Create a fully customized content with Nextjs and MDX
+readTime: 1 min
+tag: mdx,Nextjs
+wip: false
+publishedOn: July 30, 2021
+--- 
+import ImagePreview from '../../components/markdown/ImagePreview'
+
+<ImagePreview url='https://cdn.substack.com/image/fetch/w_2048,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F33056294-356b-4366-a5b0-9be7a7118205_1024x768.jpeg' title='mailbrew' href='https://app.mailbrew.com/s/newsletter/u3sjEYwSMXtL' />
+
+import LittleTokyo from './data/posts/tokyo/LittleTokyo'
+
+There are many ways that can help you to create content for your blog. Markdown, with simple and clean syntax, works for me really well. However, I want more than that: the content should be fully customized.
+
+Last week I read a [great post about drawing and architecture](https://app.mailbrew.com/s/newsletter/u3sjEYwSMXtL) and I thought it would be more intuitive if the author can embed a 3D model into the post. Something like this:
+
+<LittleTokyo/>
+
+This obviously not supported by Markdown. I did some research and found MDX is a great fit for this case as you can import and reuse React components in markdown files.
+
+In the next post, I'll walk you through how to use MDX with Nextjs.
