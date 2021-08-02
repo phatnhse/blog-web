@@ -21,7 +21,6 @@ export default function Tils({ tils }) {
 
 export const getStaticProps = async () => {
   const tils = getAllTils();
-  console.log(tils)
 
   return {
     props: { tils },
