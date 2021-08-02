@@ -21,7 +21,7 @@ export default function LittleTokyo() {
     <>
       <div className="w-full" style={{
         height: '500px',
-        background: '#bfe3dd',
+        
         maxHeight: '600px'
       }}>
         <Canvas >
@@ -35,9 +35,9 @@ export default function LittleTokyo() {
         </Canvas>
       </div>
 
-      <a className="flex mt-2 justify-center text-base text-gray-600 !font-normal !no-underline" onClick={onClick}>
+      <span className="cursor-pointer flex mt-2 justify-center text-base text-gray-700 !font-normal !no-underline" onClick={onClick}>
         click here to {enableZoom ? 'disable' : 'enable'} zoom
-      </a>
+      </span>
     </>
   )
 }
