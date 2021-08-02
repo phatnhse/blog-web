@@ -15,36 +15,34 @@ export default function IndexPage({ posts, tils }) {
 
   useEffect(() => {
     if (theme == 'light') {
-      setSrc('https://nongquanong.sfo3.cdn.digitaloceanspaces.com/nongquanong-light.png')
+      setSrc('/light.png')
     } else {
-      setSrc('https://nongquanong.sfo3.cdn.digitaloceanspaces.com/nongquanong-dark.png')
+      setSrc('/dark.png')
     }
   }, [theme]);
 
   return (
     <>
       <div>
-        <div className="base-container flex justify-between pt-6 pb-6">
+        <div className="base-container flex justify-between pt-4 pb-6">
           <div className="flex text-white items-center">
             <div>
               <Profile />
             </div>
           </div>
+
           <div className="w-auto">
-            <div className="h-72 w-72 relative">
-              {
-                src ? <Image
-                  src={src}
-                  layout="fill"
-                  objectFit="contain"
-                /> : null
-              }
-            </div>
+            {
+              src ? <img
+                src={src}
+                className="object-contain h-72 w-72 hidden"
+              /> : null
+            }
           </div>
         </div>
       </div>
 
-      <div className="base-container mt-16 grid grid-cols-5">
+      <div className="base-container mt-16 md:grid md:grid-cols-5">
         <div className="col-span-3">
           <div>
             <h1 className="font-medium text-sm text-gray-500">LATEST POST</h1>
@@ -57,14 +55,14 @@ export default function IndexPage({ posts, tils }) {
             </ul>
           </div>
         </div>
-        <div className="col-span-2 p-4">
+        <div className="col-span-2 md:p-4 mt-2 md:mt-0">
           <h1 className="font-medium text-sm text-gray-500">POPULAR TAGS</h1>
-          <div className="pt-4">
-            <Tags tags={ getAllTagsFrom(posts.concat(tils))} />
+          <div className="md:pt-4 pt-2">
+            <Tags tags={getAllTagsFrom(posts.concat(tils))} />
           </div>
 
           <div>
-            <h1 className="font-medium text-sm text-gray-500 pt-16">TODAY I LEARN</h1>
+            <h1 className="font-medium text-sm text-gray-500 pt-8 md:pt-16">TODAY I LEARN</h1>
             <ul>
               {tils.map((til, index) => (
                 <li key={index}>

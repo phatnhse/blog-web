@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <>
       <hr className="base-container mt-16" />
-      <div className="base-container mb-16 flex justify-between">
+      <div className="base-container mb-16 flex justify-between text-sm md:text-md">
         <div>
           <p className="mt-6 text-gray-600">
             Twitter <a className="a-link" href="https://twitter.com/phatnhse">@phatnhse</a>

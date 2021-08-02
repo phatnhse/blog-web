@@ -11,7 +11,7 @@ export default function Profile({ profile }) {
       </div>
 
 
-      <p className="text-base max-w-2xl font-normal text-gray-700 mt-8">
+      <p className="text-base max-w-2xl font-normal text-gray-700 mt-4">
         Hi there! I am Software Engineer at
         <a className="a-link ml-2" href="https://www.alibaba.com/">@Alibaba</a>
         <a className="a-link ml-2" href="https://www.lazada.vn/">@Lazada</a>
@@ -22,7 +22,7 @@ export default function Profile({ profile }) {
       </p>
 
       <div className="text-base font-normal text-gray-600 mt-2">
-        I enjoy building things, checkout my latest products here:
+        I enjoy building things, checkout some of my latest iteration here: 
         <ul className="mt-4">
           <li className="mt-2">👉 <span className="ml-2"><a href="https://chrome.google.com/webstore/detail/fourgifs/aenmpomagafiihpopbgbcgphcbgkmfbl?hl=en" className="a-link">fourgifs</a>, translation application with better context, using gifs!</span></li>
           <li className="mt-2">👉 <span className="ml-2"><a href="https://github.com/phatnhse/android-container" className="a-link">android-container</a>, use docker to isolate and optimize your android testing process.</span></li>
