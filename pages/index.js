@@ -15,9 +15,9 @@ export default function IndexPage({ posts, tils }) {
 
   useEffect(() => {
     if (theme == 'light') {
-      setSrc('/light.png')
+      setSrc('/light.webp')
     } else {
-      setSrc('/dark.png')
+      setSrc('/dark.webp')
     }
   }, [theme]);
 
@@ -35,7 +35,7 @@ export default function IndexPage({ posts, tils }) {
             {
               src ? <img
                 src={src}
-                className="object-contain h-72 w-72 hidden"
+                className="object-contain h-72 w-72 hidden md:block"
               /> : null
             }
           </div>
