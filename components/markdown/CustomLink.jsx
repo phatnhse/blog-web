@@ -3,7 +3,7 @@ import Link from 'next/link'
 export default function CustomLink({ as, href, ...otherProps }) {
   return <>
     <Link as={as} href={href} >
-      <a className="underline !text-blue-700 hover:text-blue-800" {...otherProps} />
+      <a className="!no-underline !text-blue-500 hover:text-blue-500" {...otherProps} />
     </Link>
   </>
 }

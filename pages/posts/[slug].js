@@ -21,7 +21,7 @@ const Post = ({ code, frontmatter }) => {
         <Tags tags={tags} />
       </div>
 
-      <div className="mt-16 mb-16 prose prose-lg">
+      <div className="mt-16 mb-16 prose">
         <Component components={
           {
             'code': InlineCode,

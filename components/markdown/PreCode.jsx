@@ -12,7 +12,7 @@ export default function PreCode({ ...otherProps }) {
   const className = otherProps.children.props.className
   
   if (rawCode && rawCode.length) {
-    return <div className="text-base font-medium not-italic">
+    return <div className="!text-base !font-normal not-italic">
       <pre>
         <code className={className}>{rawCode}</code>
       </pre>
