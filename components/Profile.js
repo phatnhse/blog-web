@@ -6,7 +6,7 @@ export default function Profile({ profile }) {
   return (
     <div className="text-black">
 
-      <div className="prose prose-lg">
+      <div className="prose">
         <h1 className="flex flex-row items-center">Too hot to code <Temparature /> </h1>
       </div>
 

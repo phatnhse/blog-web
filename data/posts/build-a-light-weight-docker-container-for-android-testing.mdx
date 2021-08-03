@@ -6,36 +6,36 @@ tags: docker,android,android-emulator,testing,CI,gradle
 wip: false
 publishedOn: Dec 5, 2019
 ---
+import Gist from 'react-gist'
 
-In this tutorial, we’re going to learn how to build a lightweight Android container to isolate the testing process.
+## Goals
 
 * No Android Studio/GUI applications required.
-
 * Android emulator runs on a Docker container.
+* Accelerates build speed and stabilize testing process, especially UI Tests.
+* Performance boost with Gradle dependencies and distribution caching.
 
-* Has ability to cache dependencies for later build.
+## Remarks
 
-* Wipe out everything after the process.
+* Assuming you have [docker installed](https://docs.docker.com/docker-for-mac/install/) and have some fundamentals knowledge about docker.
+* Linux only. MacOS/Window or any solution which uses VirtualBox to embed Docker can't run x86 emulator because [nested virtualization](https://www.virtualbox.org/ticket/4032) is yet to support. In the contrary, ARM CPU is host machine independent, which can run anywhere, however it was deprecated and extremely slow to boot.  
+* In the scope of this repo, x86 Emulator is chosen as default startup emulator since it is [10x faster](https://stackoverflow.com/questions/2662650/making-the-android-emulator-run-faster) than ARM. _KVM & nested virtualization will be needed_ so Linux-based OS as host system is required, especially if you want to build a CI machine with this image.   
 
 ## 1. Start docker container
 
-The image that we build on top of is: ubuntu:latest
-
-Assuming you have docker installed (if not, please follow this [link](https://docs.docker.com/docker-for-mac/install/)), you can run this to start docker container:
+The image that we're using to build on top of is `adoptopenjdk/openjdk8:alpine`
 
 ```bash
-docker run --privileged -dit --name android-container ubuntu
+docker run --privileged -it --name android-container adoptopenjdk/openjdk8:alpine
 ```
 
 * `privileged`: grant permission to launch VM on container.
 
 * `it`: interactively execute shell cmd.
 
-* `d`: run container in the background.
+* `name android-container`: container’s name, will use later to hijack the container
 
-* `name android-container`: container’s name, will use later to attach and commit docker image.
-
-To run docker as non-root, the simplest way is adding the current user to group docker
+To run docker as non-root, the simplest way is adding the current user to docker group as follows:
 
 ```bash
 sudo groupadd docker // Add group docker if it doesn't already exist
@@ -46,50 +46,98 @@ docker run hello-world // check if it works
 
 ## 2. Install SDK packages
 
-### **Prerequisites**:
+## Prerequisites:
 
-Make sure you install the following dependencies. Otherwise, you may notice No such file or directory when installing android SDK or start emulator
+Make sure you install the following dependencies for later use:
 
 ```bash
-apt update && apt install -y openjdk-8-jdk vim git unzip libglu1 libpulse-dev libasound2 libc6  libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxi6  libxtst6 libnss3 wget
+apk update && apk upgrade && apk add --no-cache bash git unzip wget libvirt-daemon qemu-img qemu-system-x86_64 dbus polkit virt-manager vim
 ```
 
-### **Gradle**
+## Gradle
+You can either execute Gradle Wrapper or Local Installation but first option is [more preferable](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
+> In a nutshell you gain the following benefits:
+> Standardizes a project on a given Gradle version, leading to more reliable and robust builds.
+> Provisioning a new Gradle version to different users and execution environment (e.g. IDEs or Continuous Integration servers) is as simple as changing the Wrapper definition. 
 
-Install gradle and gradle-wrapper . We’ll use version 5.4.1 in this tutorial (you can update it later with build-arg)
 
-Download gradle-5.4.1 to `/tmp/gradle-5.4.1` and unzip the content within `/opt/gradle`
+### Get the idea of Gradle Wrapper
+Gradle wrapper is a script that allow you to run the build with predefined version and settings. The generated Wrapper properties file, `gradle/wrapper/gradle-wrapper.properties`, stores the information about the Gradle distribution.
 
-```bash
-wget https://services.gradle.org/distributions/gradle-5.4.1-bin.zip -P /tmp \ 
-&& unzip -d /opt/gradle /tmp/gradle-5.4.1-bin.zip
-```     
+![gradle wrapper properties](https://github.com/fastphat/android-container/blob/master/images/gradle-wrapper.png?raw=true)
 
-Make a new directory `/opt/gradlew` and install `gradle-wrapper` there. (The directory names can be anything, but save the files to somewhere that easy to find)
+Want to use newer version? Grab one at [here](https://services.gradle.org/distributions/) and update `distributionUrl` accordingly. 
 
-```bash
-mkdir /opt/gradlew \
-&& /opt/gradle/gradle-5.4.1/bin/gradle wrapper --gradle-version 5.4.1 --distribution-type all -p /opt/gradlew \
-&& /opt/gradle/gradle-5.4.1/bin/gradle wrapper -p /opt/gradlew
+### Speed up build with Gradle Caching
+By default, all files downloaded under docker container doesn't persist if the container is removed. 
+Therefore, they will be re-downloaded in every build. 
+However, Docker offers a solution called [Volume](https://docs.docker.com/storage/). 
+It is typically directories or files on host filesystem and can be accessible from both container and host machine.
+
+You just need to define a location where the volume references to and let it take care the rest, which is as follow:
+
+```
+GRADLE_USER_HOME=/cache
+
+VOLUME $GRADLE_USER_HOME // This will be setup later in Dockerfile
 ```
 
-### **Android SDK**
+<img src="https://github.com/fastphat/android-container/blob/master/images/docker-volume.png?raw=true" width="350px" /> <br/>  
 
-You will need to download SDK manually without Android Studio bundled, SDK tools only, check the link [here](https://developer.android.com/studio) to get the URL.
+
+You can always check where the volumes are located and how they work:
+
+On Macos: 
+```shell
+~/Library/Containers/com.docker.docker/Data/vms/0/tty
+```
+
+On Linux: 
+```shell
+~/var/lib/docker/volumes
+```
+
+To list all volumes are being used: 
+```shell
+docker volume ls
+```
+
+To get all properties of a particular volume:
+```shell 
+docker volume inspect [volume_id]
+```
+
+### Non-cached vs cached gradle dependencies
+
+In some circumstances, you will notice cached dependencies is big win, especially when a project has used ton of dependencies. Let's see the different between cached and non-cached gradle for Sunflower project.   
+
+```shell
+BUILD SUCCESSFULL in 4m 25s
+
+...
+
+BUILD SUCCESSFULL in 55s 
+``` 
+
+![build time comparison](https://github.com/fastphat/android-container/blob/master/images/build-time.png?raw=true)
+
+## Android SDK
+
+We're going to download Android SDK via this [link](https://developer.android.com/studio).
 
 > The Android software development kit (SDK) includes different components, including SDK Tools, Build Tools, and Platform Tools. The SDK Tools primarily includes the stock Android emulator, [hierarchy viewer](https://developer.android.com/studio/profile/hierarchy-viewer.html), [SDK manager](https://developer.android.com/studio/intro/update.html), and [ProGuard](https://guides.codepath.com/android/Configuring-ProGuard). The Build Tools primarily include aapt (Android packaging tool to create .APK), dx (Android tool that converts .java files to .dex files). Platform Tools include the [Android debug shell](https://developer.android.com/studio/command-line/adb.html), [sqlite3](https://developer.android.com/studio/command-line/sqlite3.html) and [Systrace](https://developer.android.com/studio/profile/systrace-commandline.html).
 
-Like Gradle, we’ll save it to `/tmp` and get it extracted in `/opt`
+Save it to `/tmp` and get it extracted in `/opt`
 
 ```bash
 wget 'https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip' -P /tmp \
-&& unzip -d /opt/android /tmp/sdk-tools-linux-4333796.zip \
+&& unzip -d /opt/android /tmp/sdk-tools-linux-4333796.zip
 ```
 
-Most important packages are `platform-tools`, `tools` and `emulator`. Run this to install them quickly:
+Crucial packages are `platform-tools`, `tools` and `emulator`. Install them with this cmd:
 
 ```bash
-yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-images;android-*28*;google_apis;x86" "platforms;android-28" "build-tools;28.0.3" "emulator"
+yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-images;android-28;google_apis;x86" "platforms;android-28" "build-tools;28.0.3" "emulator"
 ```
 * `platform-tools` contains `adb`
 
@@ -97,7 +145,7 @@ yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-ima
 
 * `emulator` : run emulator
 
-* `system-images;android-*28*;google_apis;x86` : use to create avd
+* `system-images;android-28;google_apis;x86` : emulator version and other options
 
 Accept all licenses of Android SDK
 
@@ -105,19 +153,19 @@ Accept all licenses of Android SDK
 yes Y | /opt/android/tools/bin/sdkmanager --licenses
 ```    
 
-Seems good, now create an avd **`test`**
+Seems good, now create an avd name **`test`**
 
 ```bash
 echo "no" | /opt/android/tools/bin/avdmanager --verbose create avd --force --name "test" --device "pixel" --package "system-images;android-28;google_apis;x86" --tag "google_apis" --abi "x86"
 ```    
 
-* name: device’s name.
+* `name`: device’s name.
 
-* abi: CPU architecture.
+* `abi`: CPU architecture.
 
-* tag `google_api`: support Google API.
+* `tag google_api`: to support Google API.
 
-Check one more time to see if it works!
+Double check the result:
 
 ```bash
 /opt/android/emulator/emulator -list-avds 
@@ -126,18 +174,16 @@ Check one more time to see if it works!
 
 ## 3. Set up environment variables
 
-Edit your `.bashrc` or any config files that you’re familiar with:
+Edit your `.bashrc` or any config file that you’re familiar with:
 
 ```bash
-GRADLE_HOME=/opt/gradle/gradle-5.4.1
+GRADLE_USER_HOME=/cache
 ANDROID_HOME=/opt/android
-PATH=$PATH:$GRADLE_HOME/bin:/opt/gradlew:$ANDROID_HOME/emulator:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
-LD_LIBRARY_PATH= $ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/qt/lib
+PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools
+LD_LIBRARY_PATH=$ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/qt/lib
 ```
 
-***Note***: Order matters, android sdk provides 2 executed file for `emulator`, one located under `/android/emulator` and another is `/android/tools/bin`.
-
-Check this [SO answer](https://stackoverflow.com/a/49511666/5460066) for more detail.
+***Note***: Order matters, to resolve the issue with emulator since Android SDK provides 2 executed file for `emulator`, respectively under `/android/emulator` and `/android/tools/bin`. Check this [SO answer](https://stackoverflow.com/a/49511666/5460066) for more detail.
 
 ## 4. Run emulator
 
@@ -149,13 +195,29 @@ Here are some minor steps before running emulator:
 
 * Turn off animation to avoid flaky tests.
 
-Some test cases will perform an action on a view that might be not visible on a small screen — so we set the emulator up to have a high resolution (1440x2880)
-
+Put everything all together in this `start.sh` file:
 ```bash
+function check_kvm() {
+  cpu_support_hardware_acceleration=$(grep -cw ".*\(vmx\|svm\).*" /proc/cpuinfo)
+  if [ "$cpu_support_hardware_acceleration" != 0 ]; then
+    echo 1
+  else
+    echo 0
+  fi
+}
+
+function config_emulator_settings() {
+  adb shell "settings put global window_animation_scale 0.0"
+  adb shell "settings put global transition_animation_scale 0.0"
+  adb shell "settings put global animator_duration_scale 0.0"
+  adb shell "settings put global always_finish_activities 1"
+  adb shell "settings put secure show_ime_with_hard_keyboard 0"
+  adb shell "am broadcast -a com.android.intent.action.SET_LOCALE --es com.android.intent.extra.LOCALE EN"
+}
+
 function wait_emulator_to_be_ready() {
   adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
-  emulator -avd test -no-audio -no-boot-anim -no-window -accel on -gpu off -skin 1440x2880 &
-
+  emulator -avd "${EMULATOR_NAME_x86}" -verbose -no-boot-anim -wipe-data -no-snapshot -no-window -gpu off &
   boot_completed=false
   while [ "$boot_completed" == false ]; do
     status=$(adb wait-for-device shell getprop sys.boot_completed | tr -d '\r')
@@ -169,15 +231,19 @@ function wait_emulator_to_be_ready() {
   done
 }
 
-function disable_animation() {
-  adb shell "settings put global window_animation_scale 0.0"
-  adb shell "settings put global transition_animation_scale 0.0"
-  adb shell "settings put global animator_duration_scale 0.0"
+function start_emulator_if_possible() {
+  check_kvm=$(check_kvm)
+  if [ "$check_kvm" != "1" ]; then
+    echo "run emulator failed, nested virtualization is not supported"
+    return
+  else
+    wait_emulator_to_be_ready
+    sleep 1
+    config_emulator_settings
+  fi
 }
 
-wait_emulator_to_be_ready
-sleep 1
-disable_animation
+start_emulator_if_possible
 ```
 
 Start the emulator with sh `start.sh` or `./start.sh` and wait until `Boot Status: 1` which means the device is fully loaded and ready to use.
@@ -221,11 +287,11 @@ List of devices attached
 emulator-5554 device
 ```
 
-We have an Android emulator running in the container successfully!
+Now we have an Android emulator running in the container successfully!
 
 ## 5. Build docker image
 
-Open a new terminal tab, stop `android-container` and commit your changes to create a new Docker image:
+Open a new terminal tab, stop `android-container` and commit your changes to create a new docker image:
 
 ```bash
 docker stop android-container && docker commit android-container android-container:v1
@@ -239,73 +305,33 @@ docker images
                    android-container   v1
 ```
 
-For further extending with more configurations (ex: Flutter), let’s wrap things up and finalize the `Dockerfile`
-
-```bash
-FROM ubuntu
-
-LABEL maintainer "codecaigicungduoc@gmail"
-
-WORKDIR /
-
-SHELL ["/bin/bash", "-c"]
-
-RUN apt update && apt install -y openjdk-8-jdk vim git unzip libglu1 libpulse-dev libasound2 libc6 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxi6 libxtst6 libnss3 wget
-
-ARG GRADLE_VERSION=5.4.1
-ARG ANDROID_API_LEVEL=28
-ARG ANDROID_BUILD_TOOLS_LEVEL=28.0.3
-ARG EMULATOR_NAME='test'
-
-RUN wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp &&
-  unzip -d /opt/gradle /tmp/gradle-${GRADLE_VERSION}-bin.zip &&
-  mkdir /opt/gradlew &&
-  /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper --gradle-version ${GRADLE_VERSION} --distribution-type all -p /opt/gradlew &&
-  /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper -p /opt/gradlew
-
-RUN wget 'https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip' -P /tmp &&
-  unzip -d /opt/android /tmp/sdk-tools-linux-4333796.zip &&
-  yes Y | /opt/android/tools/bin/sdkmanager --install "platform-tools" "system-images;android-${ANDROID_API_LEVEL};google_apis;x86" "platforms;android-${ANDROID_API_LEVEL}" "build-tools;${ANDROID_BUILD_TOOLS_LEVEL}" "emulator" &&
-  yes Y | /opt/android/tools/bin/sdkmanager --licenses &&
-  echo "no" | /opt/android/tools/bin/avdmanager --verbose create avd --force --name "test" --device "pixel" --package "system-images;android-${ANDROID_API_LEVEL};google_apis;x86" --tag "google_apis" --abi "x86"
-
-ENV GRADLE_HOME=/opt/gradle/gradle-$GRADLE_VERSION \
-  ANDROID_HOME=/opt/android
-ENV PATH "$PATH:$GRADLE_HOME/bin:/opt/gradlew:$ANDROID_HOME/emulator:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools"
-ENV LD_LIBRARY_PATH "$ANDROID_HOME/emulator/lib64:$ANDROID_HOME/emulator/lib64/qt/lib"
-
-ADD start.sh /
-
-RUN chmod +x start.sh
-```
-
 ## 6. Build project and run tests
 
-Check out your project configurations and build the ocker image with appropriate arguments:
+We'll try to build and run E2E testing with project [Sunflower](https://github.com/android/sunflower).
+ 
+Step 1: Clone and go to top level directory of `sunflower`
+ 
+ ```shell
+ git clone https://github.com/android/sunflower && cd sunflower/
+ ```
+ 
+Step 2: Run with privileged permission in order to boot emulator on the container, then run gradle tasks (build project and run test suite)
+ 
+ ```shell
+ docker run --privileged -it \
+ --rm -v $PWD:/data -v gradle-cache:/cache android-container:v1 \
+ bash -c '. /start.sh && /data/gradlew test -p /data'
+ ```
 
-```bash
-docker build \
---build-arg GRADLE_VERSION=5.4.1 \
---build-arg ANDROID_API_LEVEL=28 \
---build-arg ANDROID_BUILD_TOOLS_LEVEL=28.0.3 \
---build-arg EMULATOR_NAME=test \
--t android-container .
+If you want to run UI test, make sure KVM is enable and run this gradle task `connectedAndroidTest`
+```shell
+/data/gradlew test connectedAndroidTest -p /data
 ```
 
-Enter the top level of your project directory and run:
+## 7. Dockerfile
+I created this `Dockerfile` so you can extend from there with any addtional configuration.
 
-```bash
-docker run --privileged -it --rm -v $PWD:/data android-container bash -c ". /start.sh && gradlew build -p /data"
-```
+<Gist id='eea0e6630b97d2a9ccdbbd4aa26337fe' />
 
-* `it`: interactive mode.
 
-* `rm`: remove volume after the process is completed.
-
-* `-v $PWD:/data`: mount your directory into the container:/data
-
-* `bash -c “ . /start.sh && gradlew build -p /data”`: start the emulator and build project.
-
-Voilà! We have the whole testing process run independently on docker container.
-
-For more detailed about build steps and sample, please check out this [GitHub repo](https://github.com/fastphat/android-container). I’ve made a cool sample with [Sunflower](https://github.com/android/sunflower) project.
+For more detailed about build steps and sample, check out this [GitHub repo](https://github.com/fastphat/android-container). 
