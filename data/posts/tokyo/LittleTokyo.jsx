@@ -6,15 +6,9 @@ import { useState } from 'react';
 
 export default function LittleTokyo() {
 
-  const [enableZoom, setEnableZoom] = useState(false)
-
   function Loader() {
     const { active, progress, errors, item, loaded, total } = useProgress();
     return <Html center> <div className="text-medium"> loading {progress} % </div></Html>;
-  }
-
-  const onClick = () => {
-    setEnableZoom(!enableZoom)
   }
 
   return (
@@ -29,15 +23,11 @@ export default function LittleTokyo() {
             <ambientLight intensity={1} />
             <directionalLight intensity={1} />
             <directionalLight intensity={1} />
-            <OrbitControls enableZoom={enableZoom} autoRotate={true} />
+              <OrbitControls enableZoom={true} autoRotate={true} />
             <Model scale={0.008} />
           </Suspense>
         </Canvas>
       </div>
-
-      <span className="cursor-pointer flex mt-2 justify-center text-base text-gray-700 !font-normal !no-underline" onClick={onClick}>
-        click here to {enableZoom ? 'disable' : 'enable'} zoom
-      </span>
     </>
   )
 }

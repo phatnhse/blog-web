@@ -2,11 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-
 [data-theme='dark'],
 [data-theme='dark'] body {
   color: #fff;
-  background-color: #121212;
+  background-color: #f6f6f6;
 }
 
 .a-link {

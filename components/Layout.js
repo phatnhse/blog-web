@@ -1,6 +1,4 @@
 import Head from "next/head";
-import Footer from "./Footer";
-import Header from "./Header";
 
 export default function Layout({ children, pageTitle, description }) {
   return (
@@ -13,9 +11,7 @@ export default function Layout({ children, pageTitle, description }) {
         <title>{pageTitle}</title>
       </Head>
       <main>
-        <Header />
         <div className="content">{children}</div>
-        <Footer />
       </main>
     </>
   );

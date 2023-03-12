@@ -4,21 +4,19 @@ import { getAllPosts, getSinglePost } from "../../utils/PostRepo"
 import InlineCode from '../../components/markdown/InlineCode';
 import BlockQuote from '../../components/markdown/BlockQuote';
 import PreCode from '../../components/markdown/PreCode';
-import Tags from '../../components/Tags'
 import CustomLink from '../../components/markdown/CustomLink';
 
 const Post = ({ code, frontmatter }) => {
-  const tags = frontmatter.tags ? frontmatter.tags.split(',') : []
   const Component = useMemo(() => getMDXComponent(code), [code]);
 
   return (
     <div className="container-medium max-w-none mt-24 mb-0">
       <p className="text-center text-4xl font-bold">{frontmatter.title}</p>
       <div className="flex justify-center font-medium text-sm text-gray-600 mt-4 mb-4">
-        {frontmatter.readTime} . {frontmatter.publishedOn}
+        {frontmatter.publishedOn}
       </div>
       <div className="flex justify-center">
-        <Tags tags={tags} />
+
       </div>
 
       <div className="mt-16 mb-16 prose">
