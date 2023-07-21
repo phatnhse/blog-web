@@ -1,0 +1,142 @@
+---
+title: Declarative UIs in Jetpack Compose
+description: Code reviews are a part of most devs’ day-to-day work. Despite being a standard industry practice for many years, there are still lots of disagreements around how code reviews should be conducted. In this post, we’ll look at how our framework helps us get code reviews done efficiently.
+tags: android,declarative,jetpack compose
+publishedOn: July 21, 2023
+---
+import Credit from '../../components/content/Credit'
+
+![Photo by <a href="https://unsplash.com/@jeshoots?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">JESHOOTS.COM</a> on <a href="https://unsplash.com/photos/sMKUYIasyDM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*LHBPtV_WtzyF4zm0XtFYkg.jpeg)
+
+<Credit content={
+    <di>
+        Photo by <a
+        href="https://unsplash.com/@jeshoots?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">JESHOOTS.COM</a> on <a
+        href="https://unsplash.com/photos/sMKUYIasyDM?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+    </di>
+}/>
+
+# **The Concept of What and How**
+
+While exploring numerous definitions of declarative programming, none seemed to give me a clear understanding. A common approach is to contrast declarative and imperative programming, often leading to the comparison of “what” vs “how”.
+
+With “what”, it implies that you only need to define your expected outcome and the compiler takes care of the rest of the work.
+
+On the other hand, “how” implies that you must tell the compiler about the exact steps to be executed.
+
+IMHO, this comparison doesn’t work out, at least for me, to capture the true difference between of two.
+
+# **Embracing Change: A Declarative Approach**
+
+I recently worked on a backend project that required various services on AWS and I had to lately switch to **[Terraform](https://www.terraform.io/)**, mostly because of its technical capabilities to seamlessly set up all the required cloud services.
+
+Let’s examine the following scenario:
+
+Let’s say, I need an instance with 512 MB RAM and a 256 unit CPU. Here’s the configuration:
+
+```
+
+resource "aws_ecs_task_definition" "my_simple_task" {
+  family                   = "my-task"
+  container_definitions    = <<DEFINITION
+  [
+    {
+      // other configurations
+      "memory": 512,
+      "cpu": 256
+    }
+  ]
+}
+```
+
+After executing the above request, everything gets created and functions flawlessly.
+
+![https://miro.medium.com/v2/resize:fit:1400/1*6FhtXoASn62A4sW_vMPj4g.png](https://miro.medium.com/v2/resize:fit:1400/1*6FhtXoASn62A4sW_vMPj4g.png)
+
+However, I realize that 512 MB of RAM isn’t ssufficient for my needs so I decide to **upgrade** my instance:
+
+```
+javaCopy code
+resource "aws_ecs_task_definition" "my_simple_task" {
+  family                   = "my-task"
+  container_definitions    = <<DEFINITION
+  [
+    {
+      // other configs
+      "memory": 1024,
+      "cpu": 512
+    }
+  ]
+}
+```
+
+After running **`terraform plan`**, it tells you exactly what the result looks like after the configuration is applied.
+
+```
+container_definitions = jsonencode(
+  {
+    // other configs
+    ~ cpu              = 256 -> 512
+    ~ memory           = 512 -> 1024
+  }
+
+  ~ id                 = "app-first-task" -> (known after apply)
+)
+
+Plan: 1 to add, 1 to change, 1 to destroy.
+```
+
+I reviewed and confirmed the plan suggested by Terraform. Any changes will be reflected after a while, and the best part is that I don’t have to manually calculate the steps required to set up my new instance (which, as you know, involves a lot of setup work).
+
+This concept introduces the **principle of change**, which is a fundamental aspect of declarative frameworks and distinguishes them from their imperative counterparts. It also emphasizes **the technical capability to identify differences between two states**, which is critical for any declarative framework to achieve its goals.
+
+# **Declarative Paradigm in the Android View World**
+
+Numerous new Android APIs have been introduced from time to time. One such update was the **[ListAdapter](https://developer.android.com/reference/androidx/recyclerview/widget/ListAdapter)**. While its performance and detailed implementation are beyond the scope of this article, it’s worth mentioning how it simplifies the process of managing changes to datasource.
+
+With the original RecyclerView.Adapter, using **`notifyDataSetChange`** could sometimes be messy, especially when dealing with lists that require handling different user actions like removing, adding, or editing certain items.
+
+However, with ListAdapter, all you need to do is call **`submitList`**:
+
+```
+adapter.submitList(dataSource);
+```
+
+There’s no magic behind **`submitList`**. It merely compares the previous and current state of the data source, identifies the changes, and reports the updated state in the UI.
+
+In a ListAdapter, the DiffUtil callback plays a crucial role in identifying specific changes in data. It employs two key methods: **`areItemsTheSame()`** and **`areContentsTheSame()`**. By defining these methods, you explicitly let the compiler spot data changes with ease. This results in an optimal UI update, reducing unnecessary rendering and boosting overall performance.
+
+# **Reflecting the Declarative Paradigm in Jetpack Compose**
+
+![https://developer.android.com/jetpack/compose/lifecycle](https://miro.medium.com/v2/resize:fit:1400/1*187-ruoMi6R_70lwmVlmnA.png)
+
+<Credit content={
+    <di>
+        <a href="https://developer.android.com/jetpack/compose/lifecycle">https://developer.android.com/jetpack/compose/lifecycle</a>
+    </di>
+}/>
+
+Jetpack Compose aligns itself with the declarative programming paradigm. It offers an **[intelligent recomposition mechanism](https://developer.android.com/jetpack/compose/mental-model#recomposition)** that identifies and optimizes the number of changes between two states, reflecting the latest state in the UI.
+
+This implementation of the declarative paradigm in Jetpack Compose demonstrates its power, flexibility, and potential to shift mindsets from imperative to declarative. In Jetpack Compose, it’s not just about “how” or “what”; it’s also about how we should **react** to any **changes** that may occur during the lifecycle of a composable.
+
+Similar to ListAdapter, Jetpack Compose also recommends specifying a unique key (or index) for each item in a **`LazyList`** or **`LazyColumn`**. This key helps Compose in identifying each composable and tracking any changes to its state.
+
+```
+
+@Composable
+fun MessageList(messages: List<Message>) {
+    LazyColumn {
+        itemsIndexed(messages) { index, message ->
+            MessageCard(message)
+        }
+    }
+}
+```
+
+In the example above, the **`itemsIndexed`** function is used to automatically assign an index to each item in the list. This index serves as a unique key, allowing the compiler to track the changes to each item.
+
+By explicitly defining indexes or unique keys for list items, you can facilitate the decomposition process, reducing the number of updates it needs to make. This approach is somewhat roughly similar to what DiffUtil callback achieves in ListAdapter.
+
+In some of my next articles, we will deep dive into how Compose UI can optimize recomposition and reduce redundant renders.
